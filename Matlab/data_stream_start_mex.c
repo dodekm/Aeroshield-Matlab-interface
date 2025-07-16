@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void getComPortString(unsigned short portNumber, char *comString, size_t size);
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (nlhs != 1 || nrhs != 2) {
         mexErrMsgTxt("wrong number of input/output arguments");
