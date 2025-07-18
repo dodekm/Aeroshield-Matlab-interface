@@ -41,9 +41,9 @@ static data_stream_return_t data_stream_message_init(data_stream_message_struct*
 	message->metadata.operation = operation;
 	message->metadata.stream_id = stream_id;
 	message->metadata.data_size = data_size;
-		#ifdef data_stream_use_checksum
+	#ifdef data_stream_use_checksum
 	message->checksum =  CRC_xor((const uint8_t*) (&message->metadata), sizeof(data_stream_metadata_t));
-	  #endif
+	#endif
 	return data_stream_ok;
 }
 
@@ -69,8 +69,10 @@ data_stream_return_t data_stream_server_init(data_stream_server_instance* stream
 	stream->file_stream.file_write_callback = file_write_callback;
 	stream->file_stream.handle = file_handle;
 
+    #ifdef data_stream_use_timestamp
 	stream->get_timestamp_fcn = get_timestamp_fcn;
 	stream->timestamp_source = timestamp_source;
+    #endif 
 	stream->user_data = user_data;
 
 	stream->state = data_stream_state_ready;
@@ -130,8 +132,9 @@ data_stream_return_t data_stream_client_write_stream(data_stream_client_instance
 #endif
 
 	memcpy((void*)stream->data_struct.data, data_ptr, (size_t)data_size);
+    #ifdef data_stream_use_checksum
 	stream->data_struct.checksum=CRC_xor((const uint8_t*) stream->data_struct.data, (size_t)data_size);
-	
+	#endif
 
 	bytes_written = 0;
 	uint32_t bytes_to_write = data_size;
@@ -211,12 +214,13 @@ if (data_size > sizeof(stream->data_struct.data)) return data_stream_error;
 		returnval = data_stream_file_error;
 		goto terminate;
 	}
+    #ifdef data_stream_use_checksum
 	if(stream->data_struct.checksum!=CRC_xor((const uint8_t*) stream->data_struct.data, (size_t)data_size))
 	{
 		returnval=data_stream_error;
 		goto terminate;
 	}
-
+    #endif
 	memcpy(data_ptr,(const void*)stream->data_struct.data, (size_t)data_size);
 	
 	
@@ -264,8 +268,9 @@ data_stream_return_t data_stream_server(data_stream_server_instance* stream) {
 			goto terminate;
 		}
 
+        #ifdef data_stream_use_checksum
 		stream->data_struct.checksum=CRC_xor((const uint8_t*) stream->data_struct.data, (size_t)metadata_rec.data_size);
-
+        #endif
 #ifdef data_stream_use_timestamp
 	if (stream->get_timestamp_fcn != NULL)
 		stream->data_struct.timestamp = stream->get_timestamp_fcn(stream->timestamp_source);
@@ -333,12 +338,14 @@ data_stream_return_t data_stream_server(data_stream_server_instance* stream) {
 		returnval = data_stream_file_error;
 		goto terminate;
 	}
+
+    #ifdef data_stream_use_checksum    
 	if(stream->data_struct.checksum!=CRC_xor((const uint8_t*) stream->data_struct.data, (size_t)metadata_rec.data_size))
 	{
 		returnval=data_stream_error;
 		goto terminate;
 	}
-
+    #endif
 
 		returnval = stream->application_data_write_callback(metadata_rec.stream_id, metadata_rec.data_size, stream->data_struct.data, stream->user_data);
 		if (returnval != data_stream_ok) {

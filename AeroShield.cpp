@@ -41,10 +41,6 @@ void AeroClass::actuatorWrite(float percentValue) {
   analogWrite(AERO_UPIN, percToPwm(percentValue));        
 }
 
-void AeroClass::actuatorWriteSampled(float percentValue) {    
-         u_sampler.sample(percentValue);
-}
-
 float AeroClass::sensorReadDegree(){
   uint16_t angle = as5600.readAngle();
   return ((int)(angle - _zero)) * AS5600_RAW_TO_DEGREES; 
@@ -71,7 +67,6 @@ class AeroClass_ : public AeroClass{
   public: 
   
   Sampler& get_y_sampler(){return y_sampler;}
-  Sampler& get_u_sampler(){return u_sampler;}
   unsigned long& get_tick(){return tick;}
 };
 
@@ -82,13 +77,8 @@ class AeroClass_ : public AeroClass{
 static void timer_callback()
 {
   interrupts();
-  if (AeroShield_.get_u_sampler().isAvailable())
-  {
-    AeroShield_.actuatorWrite(AeroShield_.get_u_sampler().read());
-  }
- digitalWrite(LED_BUILTIN, !(AeroShield_.get_tick()%5));
   AeroShield_.get_y_sampler().sample(AeroShield.sensorReadDegree());
- AeroShield_.get_tick()++;
+  AeroShield_.get_tick()++;
 }
 
 

@@ -20,6 +20,10 @@ size_t file_write_callback(void* handle,const void* buff, size_t btw,uint32_t ti
    if(!WriteFile(hSerial, (const char*)buff , btw, &dwBytesWrite, NULL)){
         return 0;
    }
+   if (!FlushFileBuffers(hSerial)) {
+    return 0;
+   }
+
    return  (size_t)dwBytesWrite;
     
 }

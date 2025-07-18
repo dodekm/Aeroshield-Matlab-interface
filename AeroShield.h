@@ -32,8 +32,7 @@ class AeroClass{
  
  public:
   bool begin(float);                                              
-  void actuatorWrite(float); 
-  void actuatorWriteSampled(float);             
+  void actuatorWrite(float);             
                    
   float referenceRead(void);                       
   float sensorReadDegree(void); 
@@ -45,7 +44,6 @@ class AeroClass{
 protected:
 
   Sampler y_sampler;
-  Sampler u_sampler;
   unsigned long tick=0;
    
  private: 

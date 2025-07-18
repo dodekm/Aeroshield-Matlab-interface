@@ -40,7 +40,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 
 	data_stream_return_t return_data_stream = data_stream_client_read_stream(instance, (data_stream_id_t) mxGetScalar(stream_id_mx),data_ptr,data_size*sizeof(float));
+     #ifdef data_stream_use_timestamp
     timestamp=instance->data_struct.timestamp;
+     #endif
     mxArray* timestamp_mx = mxCreateDoubleScalar(timestamp);
 	
 	if (return_data_stream != data_stream_ok)
