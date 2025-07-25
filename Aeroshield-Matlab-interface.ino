@@ -22,29 +22,43 @@ void loop() {
 
 data_stream_return_t data_stream_data_read_impl(data_stream_id_t stream_id, uint8_t data_size, void* data_ptr,void* user_data) {
 
-
-  switch (stream_id) {
-    case 1:
-      while(!AeroShield.isSampleAvailable()){}
+if(stream_id==1)
+{
+  while(!AeroShield.isSampleAvailable()){}
       *((float*)data_ptr) = AeroShield.sensorReadDegreeSampled(); 
       return data_stream_ok;
-    default:
-      return data_stream_wrong_stream_params;
-  };
+}
+else if(stream_id==2)
+{
+  *((float*)data_ptr) = AeroShield.referenceRead(); 
+  return data_stream_ok;
+}
+else
+{
+   return data_stream_wrong_stream_params;
+}
 }
 
 
 data_stream_return_t data_stream_data_write_impl(data_stream_id_t stream_id, uint8_t data_size, const void* data_ptr,void* user_data) {
-  switch (stream_id) {
-    case 1:
-       AeroShield.actuatorWrite(*((const float*)data_ptr));
-      return data_stream_ok;
-    default:
-      return data_stream_wrong_stream_params;
 
-  };
+
+if(stream_id==1)
+{
+  AeroShield.actuatorWrite(*((const float*)data_ptr));
+      return data_stream_ok;
+}
+else if(stream_id==2)
+{
+  return data_stream_ok;
+}
+else
+{
+   return data_stream_wrong_stream_params;
+}
 
 }
+
 
 data_stream_timestamp_t get_timestamp_impl(void* unused)
 {
