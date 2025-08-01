@@ -65,9 +65,12 @@ byte AeroClass::percToPwm(float perc){
 class AeroClass_ : public AeroClass{	
 
   public: 
-  
-  Sampler& get_y_sampler(){return y_sampler;}
-  unsigned long& get_tick(){return tick;}
+  void timer_tick()
+  {
+    y_sampler.sample(sensorReadDegree());
+    tick++;
+  }
+
 };
 
 
@@ -77,8 +80,7 @@ class AeroClass_ : public AeroClass{
 static void timer_callback()
 {
   interrupts();
-  AeroShield_.get_y_sampler().sample(AeroShield.sensorReadDegree());
-  AeroShield_.get_tick()++;
+  AeroShield_.timer_tick();
 }
 
 
